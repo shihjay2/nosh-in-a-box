@@ -105,7 +105,7 @@ echo "*/10 *  * * *   root    $NEWNOSH/noshfax" >> $NOSHCRON
 echo "*/1 *   * * *   root    $NEWNOSH/noshreminder" >> $NOSHCRON
 echo "0 0     * * *   root    $NEWNOSH/noshbackup" >> $NOSHCRON
 if [[ ! -z $DOMAIN ]]; then
-	echo "30 0    * * 1   root    /opt/letsencrypt/letsencrypt-auto renew >>  /var/log/le-renew.log" >> $NOSHCRON
+	echo "30 0    * * 1   root    /usr/local/bin/certbot-auto renew >>  /var/log/le-renew.log" >> $NOSHCRON
 fi
 chown root.root $NOSHCRON
 chmod 644 $NOSHCRON
@@ -345,9 +345,10 @@ log_only "Restarting Apache service."
 
 # Install LetsEncrypt
 if [[ ! -z $DOMAIN ]]; then
-	git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
-	cd /opt/letsencrypt
-	./letsencrypt-auto --apache -d $DOMAIN
+	cd /usr/local/bin
+	wget https://dl.eff.org/certbot-auto
+	chmod a+x /usr/local/bin/certbot-auto
+	./certbot-auto --apache -d $DOMAIN
 fi
 
 # Get IP address if needed
