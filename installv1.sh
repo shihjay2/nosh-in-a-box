@@ -4,19 +4,19 @@
 set -e
 
 # Constants and paths
-LOGDIR=/var/log/nosh2
-LOG=$LOGDIR/nosh2_installation_log
+LOGDIR=/var/log/nosh
+LOG=$LOGDIR/nosh_installation_log
 LELOG=$LOGDIR/le-renew.log
-NOSHCRON=/etc/cron.d/nosh-cs
 WEB=/var/www
+NOSHCRON=/etc/cron.d/nosh-cs
 MYSQL_DATABASE=nosh
 NOSH_DIR=/noshdocuments
-NEWNOSH=$NOSH_DIR/nosh2
+NEWNOSH=$NOSH_DIR/nosh-cs
 NEWNOSHTEST=$NEWNOSH/artisan
 NEWCONFIGDATABASE=$NOSH_DIR/nosh-cs/.env.php
 NOSHDIRFILE=$NEWNOSH/.noshdir
 WEB_GROUP=www-data
-WEB_USER=www-data
+WEB_GROUP=www-data
 WEB_CONF=/etc/apache2/conf-enabled
 FTPIMPORT=/srv/ftp/shared/import
 FTPEXPORT=/srv/ftp/shared/export
@@ -211,38 +211,64 @@ fi
 log_only "The NOSH ChartingSystem scan and fax directories are secured."
 log_only "The NOSH ChartingSystem documents directory is secured."
 cd $NOSH_DIR
-composer create-project nosh2/nosh2 --prefer-dist --stability dev
+composer create-project nosh-cs/nosh-cs --prefer-dist --stability dev
 
 # Create directory file
 touch $NOSHDIRFILE
 echo "$NOSH_DIR"/ >> $NOSHDIRFILE
 
-# Edit .env file
-sed -i '/^DB_DATABASE=/s/=.*/='"$MYSQL_DATABASE"'/' .env
-sed -i '/^DB_USERNAME=/s/=.*/='"$MYSQL_USERNAME"'/' .env
-sed -i '/^DB_PASSWORD=/s/=.*/='"$MYSQL_PASSWORD"'/' .env
-
+# Create .env file
+touch $NEWCONFIGDATABASE
+echo "<?php
+return array(
+	'mysql_database' => '$MYSQL_DATABASE',
+	'mysql_username' => '$MYSQL_USERNAME',
+	'mysql_password' => '$MYSQL_PASSWORD'
+);" >> $NEWCONFIGDATABASE
 chown -R $WEB_GROUP.$WEB_USER $NEWNOSH
 chmod -R 755 $NEWNOSH
-chmod -R 777 $NEWNOSH/storage
+chmod -R 777 $NEWNOSH/app/storage
 chmod -R 777 $NEWNOSH/public
 chmod 777 $NEWNOSH/noshfax
 chmod 777 $NEWNOSH/noshreminder
 chmod 777 $NEWNOSH/noshbackup
 log_only "Installed NOSH ChartingSystem core files."
 echo "create database $MYSQL_DATABASE" | mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD
+cd $NEWNOSH
 php artisan migrate:install
 php artisan migrate
 log_only "Installed NOSH ChartingSystem database schema."
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/templates.sql
+log_only "Installed NOSH ChartingSystem templates."
 mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/orderslist1.sql
 log_only "Installed NOSH ChartingSystem order templates."
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/meds_full.sql
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/meds_full_package.sql
+log_only "Installed NOSH ChartingSystem medication database."
 mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/supplements_list.sql
 log_only "Installed NOSH ChartingSystem supplements database."
-
-if [ -e "$WEB_CONF"/nosh2.conf ]; then
-	rm "$WEB_CONF"/nosh2.conf
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/icd9.sql
+log_only "Installed NOSH ChartingSystem ICD-9 database."
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/icd10.sql
+log_only "Installed NOSH ChartingSystem ICD-10 database."
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/cpt.sql
+log_only "Installed NOSH ChartingSystem CPT database."
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/cvx.sql
+log_only "Installed NOSH ChartingSystem immunization codes database."
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/gc.sql
+log_only "Installed NOSH ChartingSystem growth chart normalization values database."
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/lang.sql
+log_only "Installed NOSH ChartingSystem language database."
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/npi.sql
+log_only "Installed NOSH ChartingSystem NPI database."
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/pos.sql
+log_only "Installed NOSH ChartingSystem place of service database."
+mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/guardian_roles.sql
+log_only "Installed NOSH ChartingSystem guardian roles database."
+if [ -e "$WEB_CONF"/nosh.conf ]; then
+	rm "$WEB_CONF"/nosh.conf
 fi
-touch "$WEB_CONF"/nosh2.conf
+touch "$WEB_CONF"/nosh.conf
 if [[ ! -z $DOMAIN ]]; then
 	SERVERNAME=$DOMAIN
 else
@@ -279,7 +305,7 @@ APACHE_CONF="<VirtualHost _default_:80>
 Alias /nosh $NEWNOSH/public
 <Directory $NEWNOSH/public>
 	Options Indexes FollowSymLinks MultiViews
-	AllowOverride None"
+	AllowOverride All"
 if [ "$APACHE_VER" = "4" ]; then
 	APACHE_CONF="$APACHE_CONF
 	Require all granted"

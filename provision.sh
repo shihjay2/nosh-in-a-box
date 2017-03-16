@@ -67,9 +67,9 @@ apache_go() {
 
 php_go() {
 	if [[ "$UBUNTU_VER" = 16.04 ]] || [[ "$UBUNTU_VER" > 16.04 ]]; then
-		apt-get -y install php php-zip php-curl php-mysql php-pear php-mcrypt php-imap libapache2-mod-php php-gd php-imagick php-gd php-cli php-curl php-common libdbi-perl libdbd-mysql-perl libssh2-1-dev php-ssh2 php-soap imagemagick pdftk openssh-server
+		apt-get -y install php php-zip php-curl php-mysql php-pear php-mcrypt php-imap libapache2-mod-php php-gd php-imagick php-gd php-cli php-common libdbi-perl libdbd-mysql-perl libssh2-1-dev php-ssh2 php-soap imagemagick pdftk openssh-server
 	else
-		apt-get -y install php5 php5-curl php5-mysql php-pear php5-mcrypt php5-imap libapache2-mod-php5 php5-gd php5-imagick php5-gd php5-cli php5-curl php5-common libdbi-perl libdbd-mysql-perl libssh2-1-dev libssh2-php php-soap imagemagick pdftk openssh-server
+		apt-get -y install php5 php5-curl php5-mysql php-pear php5-mcrypt php5-imap libapache2-mod-php5 php5-gd php5-imagick php5-gd php5-cli php5-common libdbi-perl libdbd-mysql-perl libssh2-1-dev libssh2-php php-soap imagemagick pdftk openssh-server
 	fi
 	sed -i "s/display_startup_errors = Off/display_startup_errors = On/g" ${php_config_file}
 	sed -i "s/display_errors = Off/display_errors = On/g" ${php_config_file}
