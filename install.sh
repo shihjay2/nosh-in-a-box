@@ -13,7 +13,7 @@ MYSQL_DATABASE=nosh
 NOSH_DIR=/noshdocuments
 NEWNOSH=$NOSH_DIR/nosh2
 NEWNOSHTEST=$NEWNOSH/artisan
-NEWCONFIGDATABASE=$NOSH_DIR/nosh-cs/.env.php
+NEWCONFIGDATABASE=$NEWNOSH/.env
 NOSHDIRFILE=$NEWNOSH/.noshdir
 WEB_GROUP=www-data
 WEB_USER=www-data
@@ -218,9 +218,9 @@ touch $NOSHDIRFILE
 echo "$NOSH_DIR"/ >> $NOSHDIRFILE
 
 # Edit .env file
-sed -i '/^DB_DATABASE=/s/=.*/='"$MYSQL_DATABASE"'/' .env
-sed -i '/^DB_USERNAME=/s/=.*/='"$MYSQL_USERNAME"'/' .env
-sed -i '/^DB_PASSWORD=/s/=.*/='"$MYSQL_PASSWORD"'/' .env
+sed -i '/^DB_DATABASE=/s/=.*/='"$MYSQL_DATABASE"'/' $NEWCONFIGDATABASE
+sed -i '/^DB_USERNAME=/s/=.*/='"$MYSQL_USERNAME"'/' $NEWCONFIGDATABASE
+sed -i '/^DB_PASSWORD=/s/=.*/='"$MYSQL_PASSWORD"'/' $NEWCONFIGDATABASE
 
 chown -R $WEB_GROUP.$WEB_USER $NEWNOSH
 chmod -R 755 $NEWNOSH
