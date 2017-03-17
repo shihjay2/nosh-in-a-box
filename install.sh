@@ -235,10 +235,6 @@ echo "create database $MYSQL_DATABASE" | mysql -u $MYSQL_USERNAME -p$MYSQL_PASSW
 php artisan migrate:install
 php artisan migrate
 log_only "Installed NOSH ChartingSystem database schema."
-mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/orderslist1.sql
-log_only "Installed NOSH ChartingSystem order templates."
-mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD $MYSQL_DATABASE < $NEWNOSH/import/supplements_list.sql
-log_only "Installed NOSH ChartingSystem supplements database."
 
 if [ -e "$WEB_CONF"/nosh2.conf ]; then
 	rm "$WEB_CONF"/nosh2.conf
