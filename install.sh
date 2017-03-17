@@ -212,6 +212,7 @@ log_only "The NOSH ChartingSystem scan and fax directories are secured."
 log_only "The NOSH ChartingSystem documents directory is secured."
 cd $NOSH_DIR
 composer create-project nosh2/nosh2 --prefer-dist --stability dev
+cd $NEWNOSH
 
 # Create directory file
 touch $NOSHDIRFILE
