@@ -219,9 +219,11 @@ touch $NOSHDIRFILE
 echo "$NOSH_DIR"/ >> $NOSHDIRFILE
 
 # Edit .env file
+ESC_MYSQL_USERNAME=$(printf '%s\n' "${MYSQL_USERNAME}" | sed 's:[\/&]:\\&:g;$!s/$/\\/')
+ESC_MYSQL_PASSWORD=$(printf '%s\n' "${MYSQL_PASSWORD}" | sed 's:[\/&]:\\&:g;$!s/$/\\/')
 sed -i '/^DB_DATABASE=/s/=.*/='"${MYSQL_DATABASE}"'/' $NEWCONFIGDATABASE
-sed -i '/^DB_USERNAME=/s/=.*/='"${MYSQL_USERNAME}"'/' $NEWCONFIGDATABASE
-sed -i '/^DB_PASSWORD=/s/=.*/='"${MYSQL_PASSWORD}"'/' $NEWCONFIGDATABASE
+sed -i '/^DB_USERNAME=/s/=.*/='"${ESC_MYSQL_USERNAME}"'/' $NEWCONFIGDATABASE
+sed -i '/^DB_PASSWORD=/s/=.*/='"${ESC_MYSQL_PASSWORD}"'/' $NEWCONFIGDATABASE
 
 chown -R $WEB_GROUP.$WEB_USER $NEWNOSH
 chmod -R 755 $NEWNOSH
