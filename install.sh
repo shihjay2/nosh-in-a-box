@@ -309,7 +309,7 @@ APACHE_CONF="$APACHE_CONF
 		php_flag register_long_arrays off
 	</IfModule>
 </Directory>"
-echo "$APACHE_CONF" >> "$WEB_CONF"/nosh.conf
+echo "$APACHE_CONF" >> "$WEB_CONF"/nosh2.conf
 log_only "NOSH ChartingSystem Apache configuration file set."
 $APACHE >> $LOG 2>&1
 log_only "Restarting Apache service."
