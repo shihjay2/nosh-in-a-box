@@ -322,6 +322,8 @@ if [[ ! -z $DOMAIN ]]; then
 	wget https://dl.eff.org/certbot-auto
 	chmod a+x /usr/local/bin/certbot-auto
 	./certbot-auto --apache -d $DOMAIN
+else
+	touch $NEWNOSH/.google
 fi
 
 # Get IP address if needed
