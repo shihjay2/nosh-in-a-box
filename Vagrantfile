@@ -75,7 +75,7 @@ Vagrant.configure("2") do |config|
 
   # Allow NOSH-in-a-Box to be accessible outside your LAN
   # replace <ip gateway> to the IP address of your router (such as 192.168.1.1)
-  config.vm.provision "shell",
-    run: "always",
-    inline: "route add default gw <ip gateway>"
+  # config.vm.provision "shell",
+  #   run: "always",
+  #   inline: "route add default gw <ip gateway>"
 end
