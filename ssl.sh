@@ -3,7 +3,7 @@
 
 set -e
 
-WEB_CONF=/etc/apache2/conf-enabled
+WEB_CONF=/etc/apache2/sites-enabled
 UBUNTU_VER=$(lsb_release -rs)
 
 # Check if running as root user
