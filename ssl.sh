@@ -15,9 +15,10 @@ fi
 read -e -p "Enter your domain name (example.com): " -i "" DOMAIN
 
 if [[ ! -z $DOMAIN ]]; then
-	git clone https://github.com/letsencrypt/letsencrypt /opt/letsencrypt
-	cd /opt/letsencrypt
-	./letsencrypt-auto --apache -d $DOMAIN
+	cd /usr/local/bin
+	wget https://dl.eff.org/certbot-auto
+	chmod a+x /usr/local/bin/certbot-auto
+	./certbot-auto --apache -d $DOMAIN
 
 	if [ -e "$WEB_CONF"/nosh.conf ]; then
 		rm "$WEB_CONF"/nosh.conf
