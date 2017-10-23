@@ -34,9 +34,7 @@ autoremove_go() {
 }
 
 network_go() {
-	IPADDR=$(/sbin/ifconfig eth0 | awk '/inet / { print $2 }' | sed 's/addr://')
-	sed -i "s/^${IPADDR}.*//" /etc/hosts
-	echo ${IPADDR} ubuntu.localhost >> /etc/hosts			# Just to quiet down some error messages
+	echo "NOOP"
 }
 
 tools_go() {
