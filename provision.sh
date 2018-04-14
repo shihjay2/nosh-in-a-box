@@ -3,7 +3,7 @@
 UBUNTU_VER=$(lsb_release -rs)
 
 if [[ "$UBUNTU_VER" = 16.04 ]] || [[ "$UBUNTU_VER" > 16.04 ]]; then
-	php_config_file="/etc/php/7.0/apache2/php.ini"
+	php_config_file="/etc/php/7.2/apache2/php.ini"
 else
 	php_config_file="/etc/php5/apache2/php.ini"
 fi
@@ -64,11 +64,15 @@ apache_go() {
 }
 
 php_go() {
-	if [[ "$UBUNTU_VER" = 16.04 ]] || [[ "$UBUNTU_VER" > 16.04 ]]; then
-		apt-get -y install php php-zip php-curl php-mysql php-pear php-mcrypt php-imap libapache2-mod-php php-gd php-imagick php-gd php-cli php-common libdbi-perl libdbd-mysql-perl libssh2-1-dev php-ssh2 php-soap imagemagick pdftk openssh-server
-	else
-		apt-get -y install php5 php5-curl php5-mysql php-pear php5-mcrypt php5-imap libapache2-mod-php5 php5-gd php5-imagick php5-gd php5-cli php5-common libdbi-perl libdbd-mysql-perl libssh2-1-dev libssh2-php php-soap imagemagick pdftk openssh-server
-	fi
+	# if [[ "$UBUNTU_VER" = 16.04 ]] || [[ "$UBUNTU_VER" > 16.04 ]]; then
+	apt-get -y install software-properties-common
+	add-apt-repository ppa:ondrej/php -y
+	apt update
+	apt-get -y install php7.2 php7.2-zip php7.2-curl php7.2-mysql php-pear php7.2-imap libapache2-mod-php7.2 php7.2-gd php-imagick php7.2-cli php7.2-common libdbi-perl libdbd-mysql-perl libssh2-1-dev php-ssh2 php7.2-soap imagemagick pdftk openssh-server
+		# apt-get -y install php php-zip php-curl php-mysql php-pear php-mcrypt php-imap libapache2-mod-php php-gd php-imagick php-cli php-common libdbi-perl libdbd-mysql-perl libssh2-1-dev php-ssh2 php-soap imagemagick pdftk openssh-server
+	# else
+		# apt-get -y install php5 php5-curl php5-mysql php-pear php5-mcrypt php5-imap libapache2-mod-php5 php5-gd php5-imagick php5-gd php5-cli php5-common libdbi-perl libdbd-mysql-perl libssh2-1-dev libssh2-php php-soap imagemagick pdftk openssh-server
+	# fi
 	sed -i "s/display_startup_errors = Off/display_startup_errors = On/g" ${php_config_file}
 	sed -i "s/display_errors = Off/display_errors = On/g" ${php_config_file}
 
