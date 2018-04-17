@@ -42,10 +42,10 @@ tools_go() {
 	apt-get -y install build-essential binutils-doc git subversion bc
 
 	# Run install script at first logon
-	echo "sudo bash /vagrant/install.sh" >> /home/ubuntu/.bashrc
+	# echo "sudo bash /vagrant/install.sh" >> /home/ubuntu/.bashrc
+	echo "sudo bash /vagrant/install.sh" >> /home/vagrant/.bashrc
 	echo 'alias install-ssl="sudo bash /vagrant/ssl.sh"' >> /home/ubuntu/.bashrc
 	echo 'alias local-ip="sudo bash /vagrant/localip.sh"' >> /home/ubuntu/.bashrc
-	# echo "sudo bash /vagrant/install.sh" >> /home/vagrant/.bashrc
 }
 
 apache_go() {
