@@ -66,12 +66,7 @@ fi
 echo "Welcome to NOSH in a Box!"
 echo "You're seeing this because this is the first time the system has booted."
 echo "Let's get started..."
-if [[ "$UBUNTU_VER" = 16.04 ]] || [[ "$UBUNTU_VER" > 16.04 ]]; then
-	read -e -p "Enter your username (for SSH, MySQL, and phpMyAdmin): " -i "" USERNAME
-else
-	echo "'root' is the username to access MySQL and phpMyAdmin"
-	read -e -p "Enter your username (for SSH): " -i "" USERNAME
-fi
+read -e -p "Enter your username (for SSH, MySQL): " -i "" USERNAME
 read -e -p "Enter your MySQL password (please remember this!): " -i "" MYSQL_PASSWORD
 read -e -p "Enter your domain name (example.com): " -i "" DOMAIN
 
@@ -139,52 +134,29 @@ log_only "Restarting SSH server service"
 $SSH >> $LOG 2>&1
 
 # Install MySQL and phpMyAdmin
-if [[ "$UBUNTU_VER" = 16.04 ]] || [[ "$UBUNTU_VER" > 16.04 ]]; then
-	log_only "Installing MariaDB and phpMyAdmin..."
-	# Add Maria PPA
-	apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
-	add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://ftp.osuosl.org/pub/mariadb/repo/10.1/ubuntu xenial main'
-	apt-get update
-	# Set The Automated Root Password
-	export DEBIAN_FRONTEND=noninteractive
-	debconf-set-selections <<< "mariadb-server-10.1 mysql-server/data-dir select ''"
-	debconf-set-selections <<< "mariadb-server-10.1 mysql-server/root_password password $MYSQL_PASSWORD"
-	debconf-set-selections <<< "mariadb-server-10.1 mysql-server/root_password_again password $MYSQL_PASSWORD"
-	apt-get install -y mariadb-server mariadb-client
-	# Set default collation and character set
-	echo "[mysqld]
+log_only "Installing MariaDB..."
+# Set The Automated Root Password
+MYSQL_PASSWORD=`pwgen -s 40 1`
+log_only "Your MariaDB password is $MYSQL_PASSWORD"
+export DEBIAN_FRONTEND=noninteractive
+debconf-set-selections <<< "mariadb-server-10.1 mysql-server/data-dir select ''"
+debconf-set-selections <<< "mariadb-server-10.1 mysql-server/root_password password $MYSQL_PASSWORD"
+debconf-set-selections <<< "mariadb-server-10.1 mysql-server/root_password_again password $MYSQL_PASSWORD"
+apt-get install -y mariadb-server mariadb-client
+# Set default collation and character set
+echo "[mysqld]
 character_set_server = 'utf8'
 collation_server = 'utf8_general_ci'" >> /etc/mysql/my.cnf
-	# Configure Maria Remote Access
-	sed -i '/^bind-address/s/bind-address.*=.*/bind-address = 0.0.0.0/' /etc/mysql/my.cnf
-	mysql --user="root" --password="$MYSQL_PASSWORD" -e "GRANT ALL ON *.* TO root@'0.0.0.0' IDENTIFIED BY '$MYSQL_PASSWORD' WITH GRANT OPTION;"
-	systemctl restart mysql
-	mysql --user="root" --password="$MYSQL_PASSWORD" -e "CREATE USER '$USERNAME'@'0.0.0.0' IDENTIFIED BY '$MYSQL_PASSWORD';"
-	mysql --user="root" --password="$MYSQL_PASSWORD" -e "GRANT ALL ON *.* TO '$USERNAME'@'0.0.0.0' IDENTIFIED BY '$MYSQL_PASSWORD' WITH GRANT OPTION;"
-	mysql --user="root" --password="$MYSQL_PASSWORD" -e "GRANT ALL ON *.* TO '$USERNAME'@'%' IDENTIFIED BY '$MYSQL_PASSWORD' WITH GRANT OPTION;"
-	mysql --user="root" --password="$MYSQL_PASSWORD" -e "FLUSH PRIVILEGES;"
-	systemctl restart mysql
-	echo "phpmyadmin phpmyadmin/dbconfig-install boolean true" | debconf-set-selections
-	echo "phpmyadmin phpmyadmin/app-password-confirm password $MYSQL_PASSWORD" | debconf-set-selections
-	echo "phpmyadmin phpmyadmin/mysql/admin-pass password $MYSQL_PASSWORD" | debconf-set-selections
-	echo "phpmyadmin phpmyadmin/mysql/app-pass password $MYSQL_PASSWORD" | debconf-set-selections
-	echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect none" | debconf-set-selections
-	apt-get -y install phpmyadmin
-	MYSQL_USERNAME=$USERNAME
-	log_only "MariaDB and phpMyAdmin installed."
-else
-	log_only "Installing MySQL and phpMyAdmin..."
-	echo "mysql-server mysql-server/root_password password $MYSQL_PASSWORD" | debconf-set-selections
-	echo "mysql-server mysql-server/root_password_again password $MYSQL_PASSWORD" | debconf-set-selections
-	echo "phpmyadmin phpmyadmin/dbconfig-install boolean true" | debconf-set-selections
-	echo "phpmyadmin phpmyadmin/app-password-confirm password $MYSQL_PASSWORD" | debconf-set-selections
-	echo "phpmyadmin phpmyadmin/mysql/admin-pass password $MYSQL_PASSWORD" | debconf-set-selections
-	echo "phpmyadmin phpmyadmin/mysql/app-pass password $MYSQL_PASSWORD" | debconf-set-selections
-	echo "phpmyadmin phpmyadmin/reconfigure-webserver multiselect none" | debconf-set-selections
-	apt-get -y install mysql-client mysql-server phpmyadmin
-	MYSQL_USERNAME=root
-	log_only "MySQL and phpMyAdmin installed."
-fi
+# Configure Maria Remote Access
+sed -i '/^bind-address/s/bind-address.*=.*/bind-address = 0.0.0.0/' /etc/mysql/my.cnf
+mysql --user="root" --password="$MYSQL_PASSWORD" -e "GRANT ALL ON *.* TO root@'0.0.0.0' IDENTIFIED BY '$MYSQL_PASSWORD' WITH GRANT OPTION;"
+mysql --user="root" --password="$MYSQL_PASSWORD" -e "CREATE USER '$USERNAME'@'0.0.0.0' IDENTIFIED BY '$MYSQL_PASSWORD';"
+mysql --user="root" --password="$MYSQL_PASSWORD" -e "GRANT ALL ON *.* TO '$USERNAME'@'0.0.0.0' IDENTIFIED BY '$MYSQL_PASSWORD' WITH GRANT OPTION;"
+mysql --user="root" --password="$MYSQL_PASSWORD" -e "GRANT ALL ON *.* TO '$USERNAME'@'%' IDENTIFIED BY '$MYSQL_PASSWORD' WITH GRANT OPTION;"
+mysql --user="root" --password="$MYSQL_PASSWORD" -e "FLUSH PRIVILEGES;"
+systemctl restart mysql
+log_only "MariaDB installed."
+
 $APACHE >> $LOG 2>&1
 $MCRYPT >> $LOG 2>&1
 $IMAP >> $LOG 2>&1
@@ -219,7 +191,7 @@ touch $NOSHDIRFILE
 echo "$NOSH_DIR"/ >> $NOSHDIRFILE
 
 # Edit .env file
-ESC_MYSQL_USERNAME=$(printf '%s\n' "${MYSQL_USERNAME}" | sed 's:[\/&]:\\&:g;$!s/$/\\/')
+ESC_MYSQL_USERNAME=$(printf '%s\n' "${USERNAME}" | sed 's:[\/&]:\\&:g;$!s/$/\\/')
 ESC_MYSQL_PASSWORD=$(printf '%s\n' "${MYSQL_PASSWORD}" | sed 's:[\/&]:\\&:g;$!s/$/\\/')
 sed -i '/^DB_DATABASE=/s/=.*/='"${MYSQL_DATABASE}"'/' $NEWCONFIGDATABASE
 sed -i '/^DB_USERNAME=/s/=.*/='"${ESC_MYSQL_USERNAME}"'/' $NEWCONFIGDATABASE
@@ -233,7 +205,7 @@ chmod 777 $NEWNOSH/noshfax
 chmod 777 $NEWNOSH/noshreminder
 chmod 777 $NEWNOSH/noshbackup
 log_only "Installed NOSH ChartingSystem core files."
-echo "create database $MYSQL_DATABASE" | mysql -u $MYSQL_USERNAME -p$MYSQL_PASSWORD
+echo "create database $MYSQL_DATABASE" | sudo mysql -u $USERNAME -p$MYSQL_PASSWORD
 php artisan migrate:install
 php artisan migrate
 log_only "Installed NOSH ChartingSystem database schema."
