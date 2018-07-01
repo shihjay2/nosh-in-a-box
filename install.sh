@@ -196,6 +196,17 @@ ESC_MYSQL_PASSWORD=$(printf '%s\n' "${MYSQL_PASSWORD}" | sed 's:[\/&]:\\&:g;$!s/
 sed -i '/^DB_DATABASE=/s/=.*/='"${MYSQL_DATABASE}"'/' $NEWCONFIGDATABASE
 sed -i '/^DB_USERNAME=/s/=.*/='"${ESC_MYSQL_USERNAME}"'/' $NEWCONFIGDATABASE
 sed -i '/^DB_PASSWORD=/s/=.*/='"${ESC_MYSQL_PASSWORD}"'/' $NEWCONFIGDATABASE
+echo "TRUSTED_PROXIES=
+URI=localhost
+
+TWITTER_KEY=yourkeyfortheservice
+TWITTER_SECRET=yoursecretfortheservice
+TWITTER_REDIRECT_URI=https://example.com/login
+
+GOOGLE_KEY=yourkeyfortheservice
+GOOGLE_SECRET=yoursecretfortheservice
+GOOGLE_REDIRECT_URI=https://example.com/login
+" >> $NEWCONFIGDATABASE
 
 chown -R $WEB_GROUP.$WEB_USER $NEWNOSH
 chmod -R 755 $NEWNOSH
