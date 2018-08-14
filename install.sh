@@ -67,11 +67,10 @@ echo "Welcome to NOSH in a Box!"
 echo "You're seeing this because this is the first time the system has booted."
 echo "Let's get started..."
 read -e -p "Enter your username (for SSH, MySQL): " -i "" USERNAME
-read -e -p "Enter your MySQL password (please remember this!): " -i "" MYSQL_PASSWORD
 read -e -p "Enter your domain name (example.com): " -i "" DOMAIN
 
 # Add username
-adduser $USERNAME
+adduser --gecos "" $USERNAME
 adduser $USERNAME sudo
 
 # Check Ubuntu version

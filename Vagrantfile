@@ -71,6 +71,7 @@ Vagrant.configure("2") do |config|
   #   apt-get update
   #   apt-get install -y apache2
   # SHELL
+  config.vm.provision "shell", inline: "echo \"precedence ::ffff:0:0/96  100\" > /etc/gai.conf"
   config.vm.provision "shell", path: "provision.sh"
 
   # Allow NOSH-in-a-Box to be accessible outside your LAN
