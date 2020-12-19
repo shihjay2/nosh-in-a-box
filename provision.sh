@@ -3,7 +3,7 @@
 UBUNTU_VER=$(lsb_release -rs)
 
 if [[ "$UBUNTU_VER" = 16.04 ]] || [[ "$UBUNTU_VER" > 16.04 ]]; then
-	php_config_file="/etc/php/7.2/apache2/php.ini"
+	php_config_file="/etc/php/7.4/apache2/php.ini"
 else
 	php_config_file="/etc/php5/apache2/php.ini"
 fi

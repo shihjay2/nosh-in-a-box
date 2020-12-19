@@ -195,6 +195,7 @@ ESC_MYSQL_PASSWORD=$(printf '%s\n' "${MYSQL_PASSWORD}" | sed 's:[\/&]:\\&:g;$!s/
 sed -i '/^DB_DATABASE=/s/=.*/='"${MYSQL_DATABASE}"'/' $NEWCONFIGDATABASE
 sed -i '/^DB_USERNAME=/s/=.*/='"${ESC_MYSQL_USERNAME}"'/' $NEWCONFIGDATABASE
 sed -i '/^DB_PASSWORD=/s/=.*/='"${ESC_MYSQL_PASSWORD}"'/' $NEWCONFIGDATABASE
+sed -i '/^APP_DEBUG=/s/=.*/='"false"'/' $NEWCONFIGDATABASE
 echo "TRUSTED_PROXIES=
 URI=localhost
 

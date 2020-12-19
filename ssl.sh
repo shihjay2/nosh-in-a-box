@@ -73,7 +73,11 @@ if [[ ! -z $DOMAIN ]]; then
 		# Handle Front Controller...
 		RewriteCond %{REQUEST_FILENAME} !-d
 		RewriteCond %{REQUEST_FILENAME} !-f
-		RewriteRule ^ index.php [L]"
+		RewriteRule ^ index.php [L]
+		# Force SSL
+		RewriteCond %{HTTPS} !=on
+		RewriteCond %{HTTP_HOST} !=localhost
+		RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]"
 	if [[ "$UBUNTU_VER" = 16.04 ]] || [[ "$UBUNTU_VER" > 16.04 ]]; then
 		APACHE_CONF="$APACHE_CONF
 		<IfModule mod_php7.c>"
