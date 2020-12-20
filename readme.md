@@ -24,7 +24,7 @@ With your terminal application, go to the directory where your Vagrantfile is lo
 
 Just type in the above commands at any point in the command line
 
-	ubuntu@ubuntu_xenial:~$ install-ssl
+	ubuntu@ubuntu_focal:~$ install-ssl
 
 ## Security Vulnerabilities
 
