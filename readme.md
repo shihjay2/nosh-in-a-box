@@ -1,5 +1,7 @@
 # NOSH-in-a-Box
 
+## Try Docker NOSH first
+NOSH-in-a-Box will soon be depreciated and no longer supported.  To use NOSH, it is now recommended to try [Docker NOSH](https://github.com/shihjay2/docker-nosh) instead.
 
 ## Installation
 Go to the [wiki](https://github.com/shihjay2/nosh-in-a-box/wiki/Installation) for details.
